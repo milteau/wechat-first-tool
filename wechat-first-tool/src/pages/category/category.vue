@@ -5,7 +5,7 @@
       <view class="nav-back" @click="goBack">
         <text class="back-icon">←</text>
       </view>
-      <text class="nav-title">分类管理</text>
+      <text class="nav-title">分类</text>
       <view class="nav-spacer"></view>
     </view>
 
@@ -16,49 +16,40 @@
           class="add-input"
           type="text"
           v-model="newCategoryName"
-          placeholder="输入新分类名称..."
+          placeholder="新分类名称"
+          placeholder-class="placeholder"
           maxlength="20"
         />
-        <view class="add-btn" @click="onAddCategory">
-          <text class="add-icon">+</text>
-          <text>添加</text>
-        </view>
+        <view class="add-btn" @click="onAddCategory">添加</view>
       </view>
     </view>
 
     <!-- 分类列表 -->
     <view class="category-section">
-      <text class="section-title">📂 我的分类</text>
       <view class="category-list">
         <view
-          v-for="(c, index) in noteStore.categories"
+          v-for="c in noteStore.categories"
           :key="c.id"
           class="category-item"
-          :style="{ animationDelay: index * 0.05 + 's' }"
         >
           <view class="category-info">
-            <view class="category-icon-wrapper" :style="{ backgroundColor: c.color + '20' }">
-              <view class="category-dot" :style="{ backgroundColor: c.color }"></view>
-            </view>
+            <view class="category-dot" :style="{ backgroundColor: c.color }"></view>
             <view class="category-text">
               <text class="category-name">{{ c.name }}</text>
-              <text class="category-count">{{ getNoteCount(c.id) }} 条笔记</text>
+              <text class="category-count">{{ getNoteCount(c.id) }} 条</text>
             </view>
           </view>
           <view v-if="c.name !== '默认'" class="delete-btn" @click="onDeleteCategory(c.id)">
             <text>删除</text>
           </view>
-          <view v-else class="default-badge">
-            <text>默认</text>
-          </view>
+          <text v-else class="default-tag">默认</text>
         </view>
       </view>
     </view>
 
     <!-- 提示 -->
     <view class="tip-section">
-      <text class="tip-icon">💡</text>
-      <text class="tip-text">删除分类后，该分类下的笔记将自动移至「默认」分类</text>
+      <text>删除分类后，笔记将移至默认分类</text>
     </view>
   </view>
 </template>
@@ -81,7 +72,7 @@ function getNoteCount(categoryId: string): number {
 function onAddCategory() {
   const name = newCategoryName.value.trim()
   if (!name) {
-    uni.showToast({ title: '请输入分类名称', icon: 'none' })
+    uni.showToast({ title: '请输入名称', icon: 'none' })
     return
   }
 
@@ -92,14 +83,14 @@ function onAddCategory() {
 
   noteStore.addCategory(name)
   newCategoryName.value = ''
-  uni.showToast({ title: '添加成功 ✓', icon: 'success' })
+  uni.showToast({ title: '已添加', icon: 'success' })
 }
 
 function onDeleteCategory(id: string) {
   uni.showModal({
     title: '确认删除',
-    content: '删除后，该分类下的笔记将移至「默认」分类',
-    confirmColor: '#667eea',
+    content: '删除后笔记将移至默认分类',
+    confirmColor: '#c4a574',
     success: (res) => {
       if (res.confirm) {
         const ok = noteStore.deleteCategory(id)
@@ -111,11 +102,19 @@ function onDeleteCategory(id: string) {
 </script>
 
 <style lang="scss" scoped>
+$bg-color: #faf8f5;
+$card-bg: #ffffff;
+$text-primary: #3d3d3d;
+$text-secondary: #8a8a8a;
+$text-hint: #b5b5b5;
+$accent-color: #c4a574;
+$border-color: #f0ebe5;
+
 .page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f6f7;
+  background-color: $bg-color;
 }
 
 // 导航栏
@@ -123,116 +122,93 @@ function onDeleteCategory(id: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 60rpx 30rpx 24rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 100rpx 50rpx 30rpx;
+  background-color: $bg-color;
 }
 
 .nav-back {
-  width: 64rpx;
-  height: 64rpx;
+  width: 60rpx;
+  height: 60rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 
   .back-icon {
     font-size: 40rpx;
-    color: #ffffff;
+    color: $text-primary;
   }
 }
 
 .nav-title {
   font-size: 34rpx;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 400;
+  color: $text-primary;
+  letter-spacing: 2rpx;
 }
 
 .nav-spacer {
-  width: 64rpx;
+  width: 60rpx;
 }
 
 // 新增分类
 .add-section {
-  padding: 30rpx;
+  padding: 30rpx 50rpx;
 }
 
 .add-card {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  background-color: #ffffff;
-  border-radius: 20rpx;
+  background-color: $card-bg;
+  border-radius: 16rpx;
   padding: 20rpx 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border: 1rpx solid $border-color;
 }
 
 .add-input {
   flex: 1;
-  height: 80rpx;
+  height: 72rpx;
   font-size: 28rpx;
-  color: #333;
+  color: $text-primary;
+}
+
+.placeholder {
+  color: $text-hint;
 }
 
 .add-btn {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 20rpx 32rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50rpx;
-
-  .add-icon {
-    font-size: 32rpx;
-    color: #ffffff;
-    font-weight: 300;
-  }
+  padding: 16rpx 32rpx;
+  background-color: $accent-color;
+  border-radius: 12rpx;
 
   text {
     font-size: 28rpx;
-    color: #ffffff;
+    color: #fff;
     font-weight: 500;
   }
 }
 
 // 分类列表
 .category-section {
-  padding: 0 30rpx;
-}
-
-.section-title {
-  font-size: 28rpx;
-  color: #999;
-  margin-bottom: 20rpx;
-  display: block;
+  padding: 0 50rpx;
 }
 
 .category-list {
-  background-color: #ffffff;
-  border-radius: 20rpx;
+  background-color: $card-bg;
+  border-radius: 16rpx;
+  border: 1rpx solid $border-color;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .category-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30rpx;
-  border-bottom: 1rpx solid #f5f6f7;
-  animation: fadeIn 0.3s ease-out both;
+  padding: 32rpx;
+  border-bottom: 1rpx solid $border-color;
 
   &:last-child {
     border-bottom: none;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -242,18 +218,9 @@ function onDeleteCategory(id: string) {
   gap: 24rpx;
 }
 
-.category-icon-wrapper {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .category-dot {
-  width: 32rpx;
-  height: 32rpx;
+  width: 24rpx;
+  height: 24rpx;
   border-radius: 50%;
 }
 
@@ -265,53 +232,38 @@ function onDeleteCategory(id: string) {
 
 .category-name {
   font-size: 32rpx;
-  color: #1a1a1a;
-  font-weight: 500;
+  color: $text-primary;
 }
 
 .category-count {
   font-size: 24rpx;
-  color: #999;
+  color: $text-hint;
 }
 
 .delete-btn {
   padding: 12rpx 24rpx;
-  border-radius: 24rpx;
-  background-color: #fff0f0;
+  border-radius: 10rpx;
+  background-color: $bg-color;
 
   text {
     font-size: 26rpx;
-    color: #ff3b30;
+    color: $text-secondary;
   }
 }
 
-.default-badge {
-  padding: 12rpx 24rpx;
-  border-radius: 24rpx;
-  background-color: #f5f6f7;
-
-  text {
-    font-size: 26rpx;
-    color: #999;
-  }
+.default-tag {
+  font-size: 24rpx;
+  color: $text-hint;
 }
 
 // 提示
 .tip-section {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  padding: 30rpx 40rpx;
+  padding: 40rpx 50rpx;
   margin-top: auto;
 
-  .tip-icon {
-    font-size: 28rpx;
-  }
-
-  .tip-text {
+  text {
     font-size: 24rpx;
-    color: #999;
-    line-height: 1.5;
+    color: $text-hint;
   }
 }
 </style>

@@ -29,24 +29,19 @@
             :class="{ active: !noteStore.selectedCategoryId }"
             @click="noteStore.selectedCategoryId = null"
           >
-            <text class="category-icon">📋</text>
-            <text>全部</text>
+            全部
           </view>
           <view
             v-for="c in noteStore.categories"
             :key="c.id"
             class="category-item"
             :class="{ active: noteStore.selectedCategoryId === c.id }"
-            :style="noteStore.selectedCategoryId === c.id ? { backgroundColor: c.color + '15', borderColor: c.color } : {}"
+            :style="noteStore.selectedCategoryId === c.id ? { backgroundColor: c.color + '30', color: c.color } : {}"
             @click="noteStore.selectedCategoryId = c.id"
           >
-            <view class="category-dot" :style="{ backgroundColor: c.color }"></view>
-            <text>{{ c.name }}</text>
+            {{ c.name }}
           </view>
-          <view class="category-item manage" @click="goToCategoryManage">
-            <text class="category-icon">⚙️</text>
-            <text>管理</text>
-          </view>
+          <view class="category-item" @click="goToCategoryManage">管理</view>
         </view>
       </scroll-view>
     </view>
@@ -62,21 +57,23 @@
         >
           <view class="note-card-header">
             <text class="note-title">{{ note.title }}</text>
-            <view class="category-badge" :style="{ backgroundColor: noteStore.getCategoryById(note.categoryId)?.color + '20', color: noteStore.getCategoryById(note.categoryId)?.color }">
-              {{ noteStore.getCategoryById(note.categoryId)?.name }}
-            </view>
           </view>
           <text class="note-content">{{ note.content || '暂无内容' }}</text>
           <view class="note-footer">
-            <text class="note-time">{{ formatDate(note.updatedAt) }}</text>
+            <view class="note-meta">
+              <text class="category-tag" :style="{ color: noteStore.getCategoryById(note.categoryId)?.color }">
+                {{ noteStore.getCategoryById(note.categoryId)?.name }}
+              </text>
+              <text class="note-time">{{ formatDate(note.updatedAt) }}</text>
+            </view>
           </view>
         </view>
 
         <!-- 空状态 -->
         <view v-if="noteStore.filteredNotes.length === 0" class="empty-state">
-          <text class="empty-icon">📝</text>
+          <text class="empty-icon">📒</text>
           <text class="empty-text">暂无笔记</text>
-          <text class="empty-hint">点击右下角按钮创建第一条笔记</text>
+          <text class="empty-hint">点击下方按钮创建</text>
         </view>
       </view>
     </scroll-view>
@@ -112,74 +109,84 @@ function goToCategoryManage() {
 </script>
 
 <style lang="scss" scoped>
+$bg-color: #faf8f5;
+$card-bg: #ffffff;
+$text-primary: #3d3d3d;
+$text-secondary: #8a8a8a;
+$text-hint: #b5b5b5;
+$accent-color: #c4a574;
+$border-color: #f0ebe5;
+
 .page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f5f6f7;
+  background-color: $bg-color;
 }
 
 // 顶部标题栏
 .header {
-  padding: 60rpx 40rpx 30rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 100rpx 50rpx 40rpx;
+  background-color: $bg-color;
 
   .header-title {
-    font-size: 48rpx;
-    font-weight: 700;
-    color: #ffffff;
+    font-size: 56rpx;
+    font-weight: 300;
+    color: $text-primary;
+    letter-spacing: 2rpx;
   }
 
   .header-subtitle {
     display: block;
     font-size: 26rpx;
-    color: rgba(255, 255, 255, 0.8);
-    margin-top: 8rpx;
+    color: $text-hint;
+    margin-top: 12rpx;
   }
 }
 
 // 搜索栏
 .search-wrapper {
-  padding: 0 30rpx 24rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0 50rpx 30rpx;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 50rpx;
+  background-color: $card-bg;
+  border-radius: 16rpx;
   padding: 0 30rpx;
-  height: 80rpx;
-  box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.2);
+  height: 88rpx;
+  border: 1rpx solid $border-color;
 }
 
 .search-icon {
   font-size: 28rpx;
   margin-right: 16rpx;
+  opacity: 0.5;
 }
 
 .search-input {
   flex: 1;
-  font-size: 28rpx;
-  color: #333;
+  font-size: 30rpx;
+  color: $text-primary;
 }
 
 .clear-icon {
   font-size: 24rpx;
-  color: #999;
+  color: $text-hint;
   padding: 10rpx;
 }
 
 // 分类筛选
 .category-section {
-  background-color: #ffffff;
+  background-color: $card-bg;
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-top: 1rpx solid $border-color;
+  border-bottom: 1rpx solid $border-color;
 }
 
 .category-scroll {
-  padding: 0 20rpx;
+  padding: 0 40rpx;
 }
 
 .category-list {
@@ -188,36 +195,17 @@ function goToCategoryManage() {
 }
 
 .category-item {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 16rpx 28rpx;
-  border-radius: 50rpx;
-  font-size: 26rpx;
-  color: #666;
-  background-color: #f5f6f7;
-  border: 2rpx solid transparent;
+  padding: 14rpx 32rpx;
+  border-radius: 40rpx;
+  font-size: 27rpx;
+  color: $text-secondary;
+  background-color: $bg-color;
   white-space: nowrap;
 
   &.active {
-    color: #667eea;
-    background-color: rgba(102, 126, 234, 0.1);
-    border-color: #667eea;
+    background-color: $accent-color;
+    color: #fff;
   }
-
-  &.manage {
-    color: #999;
-  }
-}
-
-.category-icon {
-  font-size: 24rpx;
-}
-
-.category-dot {
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 50%;
 }
 
 // 笔记列表
@@ -226,59 +214,39 @@ function goToCategoryManage() {
 }
 
 .note-list-content {
-  padding: 24rpx 30rpx;
+  padding: 30rpx 50rpx;
 }
 
 .note-card {
-  background-color: #ffffff;
-  border-radius: 20rpx;
-  padding: 32rpx;
+  background-color: $card-bg;
+  border-radius: 16rpx;
+  padding: 36rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-
-  &:active {
-    transform: scale(0.98);
-    transition: transform 0.2s;
-  }
+  border: 1rpx solid $border-color;
 }
 
 .note-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   margin-bottom: 16rpx;
 }
 
 .note-title {
   font-size: 34rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  flex: 1;
-  margin-right: 16rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.category-badge {
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
   font-weight: 500;
-  white-space: nowrap;
+  color: $text-primary;
+  line-height: 1.4;
 }
 
 .note-content {
   display: block;
   font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
+  color: $text-secondary;
+  line-height: 1.7;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
 }
 
 .note-footer {
@@ -286,9 +254,20 @@ function goToCategoryManage() {
   justify-content: flex-end;
 }
 
+.note-meta {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.category-tag {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
 .note-time {
   font-size: 24rpx;
-  color: #999;
+  color: $text-hint;
 }
 
 // 空状态
@@ -296,47 +275,43 @@ function goToCategoryManage() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 160rpx;
+  padding-top: 180rpx;
 
   .empty-icon {
     font-size: 100rpx;
     margin-bottom: 30rpx;
+    opacity: 0.6;
   }
 
   .empty-text {
-    font-size: 34rpx;
-    color: #333;
-    font-weight: 600;
-    margin-bottom: 16rpx;
+    font-size: 32rpx;
+    color: $text-secondary;
+    margin-bottom: 12rpx;
   }
 
   .empty-hint {
     font-size: 26rpx;
-    color: #999;
+    color: $text-hint;
   }
 }
 
 // 新建按钮
 .fab {
   position: fixed;
-  right: 40rpx;
+  right: 50rpx;
   bottom: 60rpx;
-  width: 110rpx;
-  height: 110rpx;
-  border-radius: 55rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
+  background-color: $accent-color;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 30rpx rgba(102, 126, 234, 0.5);
-
-  &:active {
-    transform: scale(0.95);
-  }
+  box-shadow: 0 8rpx 30rpx rgba(196, 165, 116, 0.3);
 
   .fab-icon {
-    font-size: 60rpx;
-    color: #ffffff;
+    font-size: 56rpx;
+    color: #fff;
     font-weight: 300;
   }
 }

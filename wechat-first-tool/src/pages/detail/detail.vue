@@ -5,7 +5,7 @@
       <view class="nav-back" @click="goBack">
         <text class="back-icon">←</text>
       </view>
-      <text class="nav-title">{{ noteId ? '编辑笔记' : '新建笔记' }}</text>
+      <text class="nav-title">{{ noteId ? '编辑' : '新建' }}</text>
       <view class="nav-action" @click="onSave">
         <text class="save-text">保存</text>
       </view>
@@ -18,14 +18,13 @@
         type="text"
         v-model="title"
         placeholder="标题"
-        placeholder-class="title-placeholder"
+        placeholder-class="placeholder"
         maxlength="100"
       />
     </view>
 
     <!-- 分类选择 -->
     <view class="category-section">
-      <text class="section-label">📁 分类</text>
       <scroll-view class="category-scroll" scroll-x>
         <view class="category-list">
           <view
@@ -33,7 +32,6 @@
             :key="c.id"
             class="category-item"
             :class="{ active: categoryId === c.id }"
-            :style="categoryId === c.id ? { backgroundColor: c.color + '20', borderColor: c.color, color: c.color } : {}"
             @click="categoryId = c.id"
           >
             <view class="category-dot" :style="{ backgroundColor: c.color }"></view>
@@ -48,8 +46,8 @@
       <textarea
         class="content-input"
         v-model="content"
-        placeholder="开始记录你的想法..."
-        placeholder-class="content-placeholder"
+        placeholder="开始记录..."
+        placeholder-class="placeholder"
         maxlength="10000"
       />
     </view>
@@ -57,8 +55,7 @@
     <!-- 底部操作栏 -->
     <view v-if="noteId" class="bottom-bar">
       <view class="delete-btn" @click="onDelete">
-        <text class="delete-icon">🗑️</text>
-        <text>删除笔记</text>
+        <text>删除</text>
       </view>
     </view>
   </view>
@@ -107,25 +104,25 @@ function onSave() {
 
   if (noteId.value) {
     noteStore.updateNote(noteId.value, title.value, content.value, categoryId.value)
-    uni.showToast({ title: '保存成功 ✓', icon: 'success' })
+    uni.showToast({ title: '已保存', icon: 'success' })
   } else {
     noteStore.addNote(title.value, content.value, categoryId.value)
-    uni.showToast({ title: '创建成功 ✓', icon: 'success' })
+    uni.showToast({ title: '已创建', icon: 'success' })
   }
 
-  setTimeout(() => uni.navigateBack(), 1000)
+  setTimeout(() => uni.navigateBack(), 800)
 }
 
 function onDelete() {
   uni.showModal({
     title: '确认删除',
-    content: '确定要删除这条笔记吗？删除后无法恢复。',
-    confirmColor: '#ff3b30',
+    content: '删除后无法恢复',
+    confirmColor: '#c4a574',
     success: (res) => {
       if (res.confirm && noteId.value) {
         noteStore.deleteNote(noteId.value)
         uni.showToast({ title: '已删除', icon: 'success' })
-        setTimeout(() => uni.navigateBack(), 1000)
+        setTimeout(() => uni.navigateBack(), 800)
       }
     }
   })
@@ -133,11 +130,19 @@ function onDelete() {
 </script>
 
 <style lang="scss" scoped>
+$bg-color: #faf8f5;
+$card-bg: #ffffff;
+$text-primary: #3d3d3d;
+$text-secondary: #8a8a8a;
+$text-hint: #b5b5b5;
+$accent-color: #c4a574;
+$border-color: #f0ebe5;
+
 .page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f6f7;
+  background-color: $bg-color;
 }
 
 // 导航栏
@@ -145,67 +150,62 @@ function onDelete() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 60rpx 30rpx 24rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 100rpx 50rpx 30rpx;
+  background-color: $bg-color;
 }
 
 .nav-back {
-  width: 64rpx;
-  height: 64rpx;
+  width: 60rpx;
+  height: 60rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 
   .back-icon {
     font-size: 40rpx;
-    color: #ffffff;
+    color: $text-primary;
   }
 }
 
 .nav-title {
   font-size: 34rpx;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 400;
+  color: $text-primary;
+  letter-spacing: 2rpx;
 }
 
 .nav-action {
   .save-text {
     font-size: 30rpx;
-    color: #ffffff;
+    color: $accent-color;
     font-weight: 500;
   }
 }
 
 // 标题输入
 .title-section {
-  background-color: #ffffff;
-  padding: 30rpx 40rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  background-color: $card-bg;
+  padding: 30rpx 50rpx;
+  border-top: 1rpx solid $border-color;
+  border-bottom: 1rpx solid $border-color;
 }
 
 .title-input {
   width: 100%;
   font-size: 40rpx;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-weight: 500;
+  color: $text-primary;
 }
 
-.title-placeholder {
-  color: #ccc;
+.placeholder {
+  color: $text-hint;
 }
 
 // 分类选择
 .category-section {
-  background-color: #ffffff;
-  padding: 24rpx 40rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.section-label {
-  font-size: 26rpx;
-  color: #999;
-  margin-bottom: 20rpx;
-  display: block;
+  background-color: $card-bg;
+  padding: 24rpx 50rpx;
+  border-bottom: 1rpx solid $border-color;
 }
 
 .category-scroll {
@@ -221,70 +221,60 @@ function onDelete() {
   display: inline-flex;
   align-items: center;
   gap: 10rpx;
-  padding: 16rpx 28rpx;
-  border-radius: 50rpx;
-  font-size: 26rpx;
-  color: #666;
-  background-color: #f5f6f7;
-  border: 2rpx solid transparent;
+  padding: 14rpx 28rpx;
+  border-radius: 40rpx;
+  font-size: 27rpx;
+  color: $text-secondary;
+  background-color: $bg-color;
 
   &.active {
-    font-weight: 500;
+    background-color: $accent-color;
+    color: #fff;
   }
 }
 
 .category-dot {
-  width: 16rpx;
-  height: 16rpx;
+  width: 14rpx;
+  height: 14rpx;
   border-radius: 50%;
 }
 
 // 内容输入
 .content-section {
   flex: 1;
-  background-color: #ffffff;
-  margin: 24rpx;
-  border-radius: 20rpx;
+  background-color: $card-bg;
+  margin: 30rpx;
+  border-radius: 16rpx;
   padding: 30rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border: 1rpx solid $border-color;
 }
 
 .content-input {
   width: 100%;
-  min-height: 400rpx;
+  min-height: 500rpx;
   font-size: 30rpx;
-  line-height: 1.8;
-  color: #333;
-}
-
-.content-placeholder {
-  color: #ccc;
+  line-height: 1.9;
+  color: $text-primary;
 }
 
 // 底部操作栏
 .bottom-bar {
-  padding: 20rpx 40rpx calc(20rpx + env(safe-area-inset-bottom));
-  background-color: #ffffff;
-  border-top: 1rpx solid #f0f0f0;
+  padding: 20rpx 50rpx calc(30rpx + env(safe-area-inset-bottom));
+  background-color: $card-bg;
+  border-top: 1rpx solid $border-color;
 }
 
 .delete-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10rpx;
   padding: 24rpx;
-  border-radius: 50rpx;
-  background-color: #fff0f0;
-
-  .delete-icon {
-    font-size: 32rpx;
-  }
+  border-radius: 16rpx;
+  background-color: $bg-color;
 
   text {
     font-size: 30rpx;
-    color: #ff3b30;
-    font-weight: 500;
+    color: $text-secondary;
   }
 }
 </style>
