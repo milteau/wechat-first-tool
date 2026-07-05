@@ -55,11 +55,11 @@ src/
 └── uni.scss
 ```
 
-## 截图预览
+## 使用说明
 
-| 笔记列表 | 编辑笔记 | 分类管理 |
-|:---:|:---:|:---:|
-| ![列表](screenshots/list.png) | ![编辑](screenshots/edit.png) | ![分类](screenshots/category.png) |
+1. 运行 `npm run dev:mp-weixin` 启动开发服务器
+2. 用微信开发者工具导入 `dist/dev/mp-weixin` 目录
+3. 即可在微信开发者工具中预览和调试小程序
 
 ## 开源协议
 
